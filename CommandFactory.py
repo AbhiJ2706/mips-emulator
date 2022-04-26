@@ -101,10 +101,20 @@ class CommandFactory:
             pc += 4
 
     class Lw(BaseOperation):
-        pass
+        def __init__(self, s, t, i, cmd=0):
+            self.i = i
+            self.s = s
+            self.t = t
+        def eval(self, regs, pc=0, program=-1):
+            regs[self.s] = sm.lwmem(regs[self.t] + self.i * 4)
 
     class Sw(BaseOperation):
-        pass
+        def __init__(self, s, t, i, cmd=0):
+            self.i = i
+            self.s = s
+            self.t = t
+        def eval(self, regs, pc=0, program=-1):
+            sm.swmem(regs[self.t] + self.i * 4, regs[self.s])
 
     class Slt(BaseOperation):
         def __init__(self, d, s, t, cmd=0):
@@ -125,16 +135,37 @@ class CommandFactory:
             regs[self.d] = self.unsigned(regs[self.s]) < self.unsigned(regs[self.t])
 
     class Beq(BaseOperation):
-        pass
+        def __init__(self, s, t, i, cmd=0):
+            self.i = i
+            self.s = s
+            self.t = t
+        def eval(self, regs, pc=0, program=-1):
+            if regs[self.s] == regs[self.t]:
+                pc += self.i * 4
 
     class Bne(BaseOperation):
-        pass
+        def __init__(self, s, t, i, cmd=0):
+            self.i = i
+            self.s = s
+            self.t = t
+        def eval(self, regs, pc, program=-1):
+            if regs[self.s] != regs[self.t]:
+                pc += self.i * 4
 
     class Jr(BaseOperation):
-        pass
+        def __init__(self, d, cmd=0):
+            if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
+            self.d = d
+        def eval(self, regs, pc, program=-1):
+            pc = regs[self.d]
 
     class Jalr(BaseOperation):
-        pass
+        def __init__(self, d, cmd=0):
+            if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
+            self.d = d
+        def eval(self, regs, pc, program=-1):
+            regs[31] = pc
+            pc = regs[self.d]
 
     def createCmd(self, inp):
         cmd3reg = bin(int(inp) and 0b11111100000000000000011111111111)

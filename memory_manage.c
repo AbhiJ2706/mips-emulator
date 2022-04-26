@@ -1,8 +1,19 @@
+#define PY_SSIZE_T_CLEAN
 #include <Python.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <inttypes.h>
 
+
+static struct State {
+    int *mem_addr;
+    uint64_t size;
+};
+
+static PyObject *UnalignedAccessError = NULL;
+static PyObject *OutOfBoundsError = NULL;
+static struct State *ps = NULL;
 
 static PyObject *method_rqmem(PyObject *self) {
 
@@ -15,6 +26,9 @@ static PyObject *method_rqmem(PyObject *self) {
         if (memory) break;
         else amt_mem = amt_mem / 2;
     }
+
+    ps->mem_addr = memory;
+    ps->size = amt_mem;
 
     PyObject* py = PyTuple_New(2);
 
@@ -31,6 +45,17 @@ static PyObject *method_swmem(PyObject *self, PyObject *args) {
     if(!PyArg_ParseTuple(args, "ki", &addr, &val)) {
         return NULL;
     }
+    if ((uint64_t) addr % 4 != 0) {
+        char *exc_str = malloc(100 * sizeof(char));
+        sprintf(exc_str, "Unaligned access- addresses must be multiples of 4. Address accessed: %" PRIu64, (uint64_t) addr);
+        PyErr_SetString(UnalignedAccessError, exc_str);
+        return NULL;
+    } else if ((uint64_t) addr < (uint64_t) ps->mem_addr || (uint64_t) addr >= (uint64_t) (ps->mem_addr + ps->size)) {
+        char *exc_str = malloc(175 * sizeof(char));
+        sprintf(exc_str, "Out of bounds- addresses must be within the bounds to the arena. Address: %" PRIu64 ", Bounds: %" PRIu64 " %" PRIu64, (uint64_t) addr, (uint64_t) ps->mem_addr, (uint64_t) ps->mem_addr + ps->size);
+        PyErr_SetString(OutOfBoundsError, exc_str);
+        return NULL;
+    }
 
     *addr = val;
 
@@ -41,6 +66,17 @@ static PyObject *method_lwmem(PyObject *self, PyObject *args) {
     uint64_t *addr = 0;
 
     if(!PyArg_ParseTuple(args, "k", &addr)) {
+        return NULL;
+    }
+    if ((uint64_t) addr % 4 != 0) {
+        char *exc_str = malloc(100 * sizeof(char));
+        sprintf(exc_str, "Unaligned access- addresses must be multiples of 4. Address accessed: %" PRIu64, (uint64_t) addr);
+        PyErr_SetString(UnalignedAccessError, exc_str);
+        return NULL;
+    } else if ((uint64_t) addr < (uint64_t) ps->mem_addr || (uint64_t) addr >= (uint64_t) (ps->mem_addr + ps->size)) {
+        char *exc_str = malloc(175 * sizeof(char));
+        sprintf(exc_str, "Out of bounds- addresses must be within the bounds to the arena. Address: %" PRIu64 ", Bounds: %" PRIu64 " %" PRIu64, (uint64_t) addr, (uint64_t) ps->mem_addr, (uint64_t) ps->mem_addr + ps->size);
+        PyErr_SetString(OutOfBoundsError, exc_str);
         return NULL;
     }
 
@@ -77,7 +113,18 @@ static struct PyModuleDef mmmodule = {
 };
 
 PyMODINIT_FUNC PyInit_stackmem(void) {
-    return PyModule_Create(&mmmodule);
+    PyObject *module = PyModule_Create(&mmmodule);
+
+    UnalignedAccessError = PyErr_NewException("stackmem.UnalignedAccessError", NULL, NULL);
+    PyModule_AddObject(module, "UnalignedAccessError", UnalignedAccessError);
+    OutOfBoundsError = PyErr_NewException("stackmem.OutOfBoundsError", NULL, NULL);
+    PyModule_AddObject(module, "UnalignedAccessError", OutOfBoundsError);
+
+    ps = malloc(sizeof(struct State));
+    ps->mem_addr = NULL;
+    ps->size = 0;
+
+    return module;
 }
 
 
