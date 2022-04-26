@@ -116,7 +116,7 @@ class CommandFactory:
             self.s = s
             self.t = t
         def eval(self, regs, pc, program=-1):
-            regs[self.s] = sm.lwmem(regs[self.t] + self.i * 4)
+            regs[self.t] = sm.lwmem(regs[self.s] + self.i * 4)
             return pc
 
     class Sw(BaseOperation):
@@ -125,7 +125,7 @@ class CommandFactory:
             self.s = s
             self.t = t
         def eval(self, regs, pc, program=-1):
-            sm.swmem(regs[self.t] + self.i * 4, regs[self.s])
+            sm.swmem(regs[self.s] + self.i * 4, regs[self.t])
             return pc
 
     class Slt(BaseOperation):
