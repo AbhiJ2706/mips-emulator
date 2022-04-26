@@ -16,7 +16,12 @@ static PyObject *method_rqmem(PyObject *self) {
         else amt_mem = amt_mem / 2;
     }
 
-    return PyLong_FromLong((uint64_t) memory);
+    PyObject* py = PyTuple_New(2);
+
+    PyTuple_SET_ITEM(py, 0, Py_BuildValue("k", memory));
+    PyTuple_SET_ITEM(py, 1, Py_BuildValue("k", amt_mem));
+
+    return py;
 }
 
 static PyObject *method_swmem(PyObject *self, PyObject *args) {
@@ -43,9 +48,9 @@ static PyObject *method_lwmem(PyObject *self, PyObject *args) {
 }
 
 static PyObject *method_fmem(PyObject *self, PyObject *args) {
-    int *addr = 0;
+    uint64_t *addr = 0;
 
-    if(!PyArg_ParseTuple(args, "i", &addr)) {
+    if(!PyArg_ParseTuple(args, "k", &addr)) {
         return NULL;
     }
 

@@ -18,7 +18,7 @@ class CommandFactory:
     class Word(BaseOperation):
         def __init__(self, val):
             self.val = val
-        def eval(self):
+        def eval(self, regs=[], pc=0, program=-1):
             return self.val
 
     class Add(BaseOperation):
@@ -27,7 +27,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[self.s] + regs[self.t]
 
     class Sub(BaseOperation):
@@ -36,9 +36,8 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[self.s] - regs[self.t]
-        
 
     class Mult(BaseOperation):
         def __init__(self, d, s, t, cmd=0):
@@ -46,7 +45,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[self.s] * regs[self.t]
 
     class Div(BaseOperation):
@@ -55,7 +54,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[self.s] / regs[self.t]
             regs[self.d + 1] = regs[self.s] % regs[self.t]
 
@@ -66,7 +65,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = self.unsigned(regs[self.s]) * self.unsigned(regs[self.t])
 
     class Divu(BaseUnsignedOperation):
@@ -75,7 +74,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] =  self.unsigned(regs[self.s]) /  self.unsigned(regs[self.t])
             regs[self.d + 1] = self.unsigned(regs[self.s]) %  self.unsigned(regs[self.t])
 
@@ -83,18 +82,23 @@ class CommandFactory:
         def __init__(self, d, cmd=0):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[33]
 
     class Mflo(BaseOperation):
         def __init__(self, d, cmd=0):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[32]
 
     class Lis(BaseOperation):
-        pass
+        def __init__(self, d, cmd=0):
+            if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
+            self.d = d
+        def eval(self, regs, pc, program):
+            regs[self.d] = program[pc + 4]
+            pc += 4
 
     class Lw(BaseOperation):
         pass
@@ -108,7 +112,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = regs[self.s] < regs[self.t]
 
     class Sltu(BaseUnsignedOperation):
@@ -117,7 +121,7 @@ class CommandFactory:
             self.d = d
             self.s = s
             self.t = t
-        def eval(self, regs):
+        def eval(self, regs, pc=0, program=-1):
             regs[self.d] = self.unsigned(regs[self.s]) < self.unsigned(regs[self.t])
 
     class Beq(BaseOperation):
