@@ -83,6 +83,25 @@ static PyObject *method_lwmem(PyObject *self, PyObject *args) {
     return PyLong_FromLong(*addr);
 }
 
+static PyObject *method_addtoarr(PyObject *self, PyObject *args) {
+    int index = 0;
+    int item = 0;
+
+    if(!PyArg_ParseTuple(args, "ii", &index, &item)) {
+        return NULL;
+    }
+
+    if (!ps->mem_addr) {
+        char *exc_str = malloc(175 * sizeof(char));
+        sprintf(exc_str, "Out of bounds- addresses must be within the bounds to the arena. Address: array access, Bounds: %" PRIu64 " %" PRIu64, (uint64_t) ps->mem_addr, (uint64_t) ps->mem_addr + ps->size);
+        PyErr_SetString(OutOfBoundsError, exc_str);
+        return NULL;
+    }
+
+    ps->mem_addr[index + 1] = item;
+    return PyLong_FromLong(1);
+}
+
 static PyObject *method_fmem(PyObject *self, PyObject *args) {
     uint64_t *addr = 0;
 
@@ -95,11 +114,14 @@ static PyObject *method_fmem(PyObject *self, PyObject *args) {
     return PyLong_FromLong(1);
 }
 
+
+
 static PyMethodDef MMMethods[] = {
     {"rqmem", method_rqmem, METH_VARARGS, "Python interface to request space for the stack"},
     {"lwmem", method_lwmem, METH_VARARGS, "Python interface to load a value from the stack"},
     {"swmem", method_swmem, METH_VARARGS, "Python interface to save a value to the stack"},
     {"fmem", method_fmem, METH_VARARGS, "Python interface to free the stack"},
+    {"addtoarr", method_addtoarr, METH_VARARGS, "Python interface to add to the initial array"},
     {NULL, NULL, 0, NULL}
 };
 
@@ -127,12 +149,7 @@ PyMODINIT_FUNC PyInit_stackmem(void) {
     return module;
 }
 
-
-
 int main() {
-    FILE *fp = fopen("write.txt", "w");
-    fputs("Real Python!", fp);
-    fclose(fp);
     return 1;
 }
 

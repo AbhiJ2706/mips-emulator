@@ -28,9 +28,30 @@ class Program:
         with open(self.fname) as lines:
             for l in lines:
                 self.instrs.append(l)
-        while self.pc != -1:
-            cmd = self.instrs[int(self.pc / 4)]
-            self.pc += 4
-            self.pc = self.builder.createCmd(cmd).eval(self.registers, self.pc, self)
+        try:
+            while self.pc != -1:
+                cmd = self.instrs[int(self.pc / 4)]
+                self.pc += 4
+                self.pc = self.builder.createCmd(cmd).eval(self.registers, self.pc, self)
+        except Exception as e:
+            print(e)
+        print(self.registers)
+        sm.fmem(self.memaddr)
+    
+    def array(self):
+        self.registers[1] = self.memaddr + 4
+        self.registers[2] = int(input("Enter length of array: "))
+        for i in range(self.registers[2]):
+            sm.addtoarr(i, int(input(f"Enter array item {i}: ")))
+        with open(self.fname) as lines:
+            for l in lines:
+                self.instrs.append(l)
+        try:
+            while self.pc != -1:
+                cmd = self.instrs[int(self.pc / 4)]
+                self.pc += 4
+                self.pc = self.builder.createCmd(cmd).eval(self.registers, self.pc, self)
+        except Exception as e:
+            print(e)
         print(self.registers)
         sm.fmem(self.memaddr)
