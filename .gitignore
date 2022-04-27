@@ -1,7 +1,9 @@
-build
-__pycache__
 test.mips
 asm
 asm.cc
 scanner.cc
 scanner.h
+asm.dSYM
+build
+__pycache__
+test.asm
