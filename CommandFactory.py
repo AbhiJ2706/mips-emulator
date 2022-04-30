@@ -105,8 +105,11 @@ class CommandFactory:
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
         def eval(self, regs, pc, program):
-            inp = int("0b" + program[pc].strip("\n"), 2)
-            regs[self.d] = inp
+            try:
+                inp = int("0b" + program[pc].strip("\n"), 2)
+                regs[self.d] = inp
+            except:
+                raise InvalidOperationException("Immediate does not exist")
             pc += 4
             return pc
 
