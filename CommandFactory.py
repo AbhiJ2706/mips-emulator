@@ -22,7 +22,7 @@ class CommandFactory:
             return self.val
 
     class Add(BaseOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
             self.s = s
@@ -32,7 +32,7 @@ class CommandFactory:
             return pc
 
     class Sub(BaseOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
             self.s = s
@@ -42,7 +42,7 @@ class CommandFactory:
             return pc
 
     class Mult(BaseOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d != 33: raise InvalidOperationException("Destination register is not hi for command " + cmd)
             self.d = d
             self.s = s
@@ -52,7 +52,7 @@ class CommandFactory:
             return pc
 
     class Div(BaseOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d != 32: raise InvalidOperationException("Destination register is not lo for command " + cmd)
             self.d = d
             self.s = s
@@ -63,7 +63,7 @@ class CommandFactory:
             return pc
 
     class Multu(BaseUnsignedOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             super()
             if d != 33: raise InvalidOperationException("Destination register is not hi for command " + cmd)
             self.d = d
@@ -74,7 +74,7 @@ class CommandFactory:
             return pc
 
     class Divu(BaseUnsignedOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d != 32: raise InvalidOperationException("Destination register is not lo for command " + cmd)
             self.d = d
             self.s = s
@@ -85,7 +85,7 @@ class CommandFactory:
             return pc
 
     class Mfhi(BaseOperation):
-        def __init__(self, d, cmd=0):
+        def __init__(self, d, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
         def eval(self, regs, pc, program=-1):
@@ -93,7 +93,7 @@ class CommandFactory:
             return pc
 
     class Mflo(BaseOperation):
-        def __init__(self, d, cmd=0):
+        def __init__(self, d, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
         def eval(self, regs, pc, program=-1):
@@ -101,7 +101,7 @@ class CommandFactory:
             return pc
 
     class Lis(BaseOperation):
-        def __init__(self, d, cmd=0):
+        def __init__(self, d, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
         def eval(self, regs, pc, program):
@@ -111,7 +111,7 @@ class CommandFactory:
             return pc
 
     class Lw(BaseOperation):
-        def __init__(self, s, t, i, cmd=0):
+        def __init__(self, s, t, i, cmd="0"):
             self.i = i
             self.s = s
             self.t = t
@@ -120,7 +120,7 @@ class CommandFactory:
             return pc
 
     class Sw(BaseOperation):
-        def __init__(self, s, t, i, cmd=0):
+        def __init__(self, s, t, i, cmd="0"):
             self.i = i
             self.s = s
             self.t = t
@@ -129,7 +129,7 @@ class CommandFactory:
             return pc
 
     class Slt(BaseOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
             self.s = s
@@ -139,7 +139,7 @@ class CommandFactory:
             return pc
 
     class Sltu(BaseUnsignedOperation):
-        def __init__(self, d, s, t, cmd=0):
+        def __init__(self, d, s, t, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
             self.s = s
@@ -149,7 +149,7 @@ class CommandFactory:
             return pc
 
     class Beq(BaseOperation):
-        def __init__(self, s, t, i, cmd=0):
+        def __init__(self, s, t, i, cmd="0"):
             self.i = i
             self.s = s
             self.t = t
@@ -159,7 +159,7 @@ class CommandFactory:
             return pc
 
     class Bne(BaseOperation):
-        def __init__(self, s, t, i, cmd=0):
+        def __init__(self, s, t, i, cmd="0"):
             self.i = i
             self.s = s
             self.t = t
@@ -169,7 +169,7 @@ class CommandFactory:
             return pc
 
     class Jr(BaseOperation):
-        def __init__(self, d, cmd=0):
+        def __init__(self, d, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
         def eval(self, regs, pc, program=-1):
@@ -177,7 +177,7 @@ class CommandFactory:
             return pc
 
     class Jalr(BaseOperation):
-        def __init__(self, d, cmd=0):
+        def __init__(self, d, cmd="0"):
             if d == 0: raise InvalidOperationException("Destination register is 0 for command " + cmd)
             self.d = d
         def eval(self, regs, pc, program=-1):

@@ -21,6 +21,14 @@ class Program:
     
     def __getitem__(self, k):
         return self.instrs[int(k / 4)]
+    
+    def __str__(self):
+        rep = ""
+        for i in range(len(self.registers)):
+            if i < 32: rep += f"${i}: {self.registers[i]}\n"
+            elif i == 32: rep += f"$lo: {self.registers[i]}\n"
+            elif i == 33: rep += f"$hi: {self.registers[i]}\n"
+        return rep
 
     def twoints(self):
         self.registers[1] = int(input("Enter value for register 1: "))
@@ -30,12 +38,16 @@ class Program:
                 self.instrs.append(l)
         try:
             while self.pc != -1:
-                cmd = self.instrs[int(self.pc / 4)]
+                try:
+                    cmd = self.instrs[int(self.pc / 4)]
+                except: raise Program.NoEndingException()
                 self.pc += 4
                 self.pc = self.builder.createCmd(cmd).eval(self.registers, self.pc, self)
+            print(self)
+        except Program.NoEndingException as e:
+            print(e.what())
         except Exception as e:
             print(e)
-        print(self.registers)
         sm.fmem(self.memaddr)
     
     def array(self):
