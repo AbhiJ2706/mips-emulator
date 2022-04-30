@@ -228,13 +228,13 @@ class CommandFactory:
                 return CommandFactory.Sltu(*self.process3Regs(inp))
         match bin(cmd2reg):
             case "0b11000":
-                return CommandFactory.Mult(*self.process2Regs(inp))
+                return CommandFactory.Mult(33, *self.process2Regs(inp))
             case "0b11001":
-                return CommandFactory.Div(*self.process2Regs(inp))
+                return CommandFactory.Div(32, *self.process2Regs(inp))
             case "0b11010":
-                return CommandFactory.Multu(*self.process2Regs(inp))
+                return CommandFactory.Multu(33, *self.process2Regs(inp))
             case "0b11011":
-                return CommandFactory.Divu(*self.process2Regs(inp))
+                return CommandFactory.Divu(32, *self.process2Regs(inp))
         match bin(cmd1regi):
             case "0b10000":
                 return CommandFactory.Mfhi(self.process1Regi(inp))
